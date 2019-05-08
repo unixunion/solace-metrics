@@ -37,7 +37,6 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
             Ok(response) => {
                 info!("{}",format!("{}", serde_yaml::to_string(&response.data().unwrap()).unwrap()));
                 Ok(response)
-//                MsgVpnResponse::persist(output_dir, response);
             },
             Err(e) => {
                 println!("get monitor error: {:?}", e);
