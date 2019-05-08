@@ -170,18 +170,6 @@ fn main() -> Result<(), Box<Error>> {
                     error!("unable to persist metric")
                 }
             }
-
-//            if write_fetch_files {
-//                match x {
-//                    Ok(vpn) => {
-//                        info!("saving output");
-//                        MsgVpnResponse::save(output_dir, &vpn);
-//                    },
-//                    Err(e) => {
-//                        error!("error: {}", e)
-//                    }
-//                }
-//            }
         }
     }
 
