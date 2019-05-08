@@ -8,6 +8,10 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 * tag / dimension data
 * persist to InfluxDB
 
+## Status
+
+POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to influx.
+
 ## Running
 
 ```
