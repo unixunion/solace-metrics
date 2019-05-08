@@ -1,0 +1,54 @@
+name: solace-provision
+version: 0.1.6
+author: Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
+about: SEMPv2 version 9.1.0.77 solace provisioning tool, see https://github.com/unixunion/solace-provision for src and examples
+args:
+  - config:
+      long: config
+      value_name: CONFIG
+      help: Sets the solace config file
+      takes_value: true
+      required: true
+  - influxdb:
+      long: influxdb
+      help: influxdb url e.g http://127.0.0.1:8086
+      takes_value: true
+      required: true
+  - influxdb-user:
+      long: influxdb-user
+      help: influxdb user
+      takes_value: true
+      required: true
+  - influxdb-pass:
+        long: influxdb-pass
+        help: influxdb password
+        takes_value: true
+        required: true
+  - influxdb-dbname:
+        long: influxdb-dbname
+        help: the db name
+        takes_value: true
+        required: true
+  - output:
+        long: output
+        help: output dir
+        takes_value: true
+  - selector:
+        long: selector
+        help: selector, default "*"
+        takes_value: true
+
+subcommands:
+  # The name of this subcommand will be 'subcmd' which can be accessed in your
+  # Rust code later
+  - vpn:
+      about: vpn metrics
+      version: 9.1.0.77
+      author: Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
+      # Subcommand args are exactly like App args
+      args:
+        - message-vpn:
+            long: message-vpn
+            help: vpn to fetch
+            takes_value: true
+            required: true
