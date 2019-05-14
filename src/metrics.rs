@@ -1,7 +1,9 @@
+
 extern crate influx_db_client;
 
-use influx_db_client::{Point, Points, Value, Precision};
+use influx_db_client::{Point, Points, Precision};
 use influx_db_client::Client as InfluxClient;
+use influx_db_client::Value as InfluxValue;
 use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse};
 use std::collections::HashMap;
 use solace_semp_client_monitor::apis::client::APIClient;
@@ -11,15 +13,67 @@ use crate::helpers::getselect;
 use tokio_core::reactor::Core;
 use futures::future::Future;
 use std::time::{SystemTime, UNIX_EPOCH};
+use itertools::{Itertools, iterate};
+use serde_json::Value;
+use serde::Serialize;
+use crate::data::Data;
 
 mod test {
 
 }
 
+
 pub trait Metric<T> {
+
     fn get(item_name: &str, subitem_name: &str, selector: &str, apiclient: &APIClient<HttpsConnector<HttpConnector>>, core: &mut Core) -> Result<T, &'static str>;
     fn create_metric(point: &str, item: &T, tags: HashMap<String, String>, influxdb_client: &mut InfluxClient) -> Point;
+    fn extract_data(item: &T) -> Point;
+
+    fn make_fields(&self, data: String, measurement_name: &str) -> Result<Point, &'static str> {
+//        fn make_fields<'a>(&self, measurement_name: &str) -> Result<Point, &'static str> where Self: Data<'a, &T> {
+        let mut point = Point::new(measurement_name);
+
+        info!("string: {:?}", data);
+        let t: HashMap<String, Value> = serde_json::from_str(&data).unwrap();
+        for (k,v) in t.into_iter() {
+            match v.as_i64() {
+                Some(v1) => {
+                    info!("{:?} {:?}", k, v1);
+                    point.add_field(k, InfluxValue::Integer(v1));
+                },
+                None => {
+                    error!("skipping: {:?}", k);
+                }
+            }
+        }
+        Ok(point)
+
+//        match serde_json::to_string(&self.data().unwrap()) {
+//            Ok(s) => {
+//                info!("string: {:?}", &s);
+//                let t: HashMap<String, Value> = serde_json::from_str(&s).unwrap();
+//                for (k,v) in t.into_iter() {
+//                    match v.as_i64() {
+//                        Some(v1) => {
+//                            info!("{:?} {:?}", k, v1);
+//                            point.add_field(k, InfluxValue::Integer(v1));
+//                        },
+//                        None => {
+//                            error!("skipping: {:?}", k);
+//                        }
+//                    }
+//                }
+//                Ok(point)
+//            },
+//            Err(e) => {
+//                error!("error serializing, {:?}", e);
+//                Err("error serializing")
+//            }
+//        }
+    }
 }
+
+
 
 impl Metric<MsgVpnResponse> for MsgVpnResponse {
 
@@ -51,26 +105,78 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
 
         let t = item.data().unwrap();
 
-        let mut point1 = Point::new(point);
+//        let mut vpn_points =  item.make_fields("vpn-stats");
+        let mut vpn_points = MsgVpnResponse::extract_data(item);
 
         for tag in tags {
-            point1.add_tag(tag.0, Value::String(tag.1));
+            vpn_points.add_tag(tag.0, InfluxValue::String(tag.1));
         }
 
-        point1
-            .add_tag("msg-vpn-name", Value::String(t.msg_vpn_name().cloned().unwrap()))
-            .add_field("msg-spool-usage", Value::Integer(t.msg_spool_usage().cloned().unwrap()))
-            .add_field("avg-rx-msg-rate", Value::Integer(*t.rate().cloned().unwrap().average_rx_msg_rate().unwrap()))
-            .add_field("avg-tx-msg-rate", Value::Integer(*t.rate().cloned().unwrap().average_tx_msg_rate().unwrap()))
-            .add_field("avg-rx-byte-rate", Value::Integer(*t.rate().cloned().unwrap().average_rx_byte_rate().unwrap()))
-            .add_field("avg-tx-byte-rate", Value::Integer(*t.rate().cloned().unwrap().average_tx_byte_rate().unwrap()))
 
+        vpn_points
             .add_timestamp(time::now().to_timespec().sec)
             .to_owned();
 
-        info!("created point {:?}", point1);
-        point1
+        info!("created point {:?}", vpn_points);
 
+        vpn_points
+
+//        match vpn_points {
+//            Ok(points) => {
+//                points
+//            },
+//            _ => {
+//                unimplemented!()
+//            },
+//            Err(_) => {
+//                error!("something bad happened")
+//            }
+//        }
+
+    }
+
+    fn extract_data(item: &MsgVpnResponse) -> Point {
+        match serde_json::to_string(item.data().unwrap()) {
+            Ok(s) => {
+                match item.make_fields(s, "message-vpn") {
+                    Ok(p) => {
+                        p
+                    }
+                    _ => {
+                        unimplemented!()
+                    }
+                }
+            }
+            _ => {
+                unimplemented!()
+            }
+        }
     }
 }
 
+
+
+
+//        match serde_json::to_string(&item.data().unwrap()) {
+//            Ok(s) => {
+//                info!("string: {:?}", &s);
+//
+//                let t: HashMap<String, Value> = serde_json::from_str(&s).unwrap();
+//                for (k,v) in t.into_iter() {
+//                    match v.as_i64() {
+//                        Some(v1) => {
+//                            info!("{:?} {:?}", k, v1);
+//                            vpn_points.add_field(k, InfluxValue::Integer(v1));
+//                        },
+//                        None => {
+//                            error!("skipping: {:?}", k);
+//                        }
+//                    }
+//                }
+//
+//
+//            },
+//            Err(e) => {
+//                error!("error serializing, {:?}", e);
+//            }
+//        }

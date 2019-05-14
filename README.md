@@ -22,4 +22,7 @@ RUST_LOG=info cargo run -- --output testdir --config solace.yaml --influxdb http
 
 ```
 curl 'localhost:8086/query?pretty=true' --data-urlencode "db=smg" --data-urlencode "q=SELECT \"msg-spool-usage\" FROM \"message-vpn\""
+
+
+
 ```

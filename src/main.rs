@@ -2,6 +2,8 @@
 extern crate log;
 extern crate env_logger;
 extern crate influx_db_client;
+extern crate itertools;
+
 
 use std::error::Error;
 use clap::{Arg, App, load_yaml};
@@ -24,6 +26,7 @@ mod helpers;
 mod clientconfig;
 mod metrics;
 mod save;
+mod data;
 
 fn main() -> Result<(), Box<Error>> {
 
@@ -159,7 +162,7 @@ fn main() -> Result<(), Box<Error>> {
 
             match x {
                 Ok(vpn) => {
-                    let p = MsgVpnResponse::create_metric("message-vpn", &vpn, metatags, &mut influxdb_client);
+                    let p = MsgVpnResponse::create_metric("vpn-stats", &vpn, metatags, &mut influxdb_client);
                     points.push(p);
 
                     if write_fetch_files {

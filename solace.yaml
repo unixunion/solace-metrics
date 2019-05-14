@@ -1,7 +1,8 @@
 ---
 meta:
   environment: dev
-  tool: kegan
+  app: solace
+  host: solace-mq.local
 username: admin
 password: admin
 host: http://localhost:8081/SEMP/v2/monitor
