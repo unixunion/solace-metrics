@@ -29,6 +29,9 @@ pub trait Metric<T> {
     fn create_metric(point: &str, item: &T, tags: HashMap<String, String>, influxdb_client: &mut InfluxClient) -> Point;
     fn extract_data(item: &T) -> Point;
 
+    /*
+    make fields directly off the root of JSON, and decend one level if object in value.
+    */
     fn make_fields(&self, data: String, measurement_name: &str) -> Result<Point, &'static str> {
 
         let mut point = Point::new(measurement_name);

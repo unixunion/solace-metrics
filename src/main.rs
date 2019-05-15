@@ -4,6 +4,7 @@ extern crate std_logger;
 extern crate influx_db_client;
 extern crate itertools;
 
+use std::thread;
 use std::error::Error;
 use clap::{Arg, App, load_yaml};
 use std::borrow::Cow;
@@ -183,12 +184,11 @@ fn main() -> Result<(), Box<Error>> {
         }
     }
 
+    info!("writing points to influxdb");
+    let num_points = &points.len();
     let mut pointbatch = Points::create_new(points);
-
-    // if Precision is None, the default is second
-    // Multiple write
     let _ = influxdb_client.write_points(pointbatch, Some(Precision::Seconds), None).unwrap();
-    info!("wrote points");
+    info!("wrote {:?} points", num_points);
 
     Ok(())
 }
