@@ -41,6 +41,7 @@ pub trait Metric<T> {
             debug!("key: {:?} value: {:?}", k, v);
 
             match v {
+                // descend into objets
                 Value::Object(obj) => {
                     for (ok, ov) in obj {
                         let key = format!("{}_{}", k, ok);
@@ -48,14 +49,15 @@ pub trait Metric<T> {
                         point.add_field(key, InfluxValue::Integer(ov.as_i64().unwrap()));
                     }
                 },
+                // add keys with number values
                 Value::Number(num) => {
                     info!("{:?} {:?}", k, num);
                     point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
                 },
+                // skip anything else
                 _ => {
                     debug!("skipping: {:?}, {:?}", k, v);
                 }
-
             }
 
         }

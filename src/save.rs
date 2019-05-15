@@ -79,6 +79,7 @@ impl Save<MsgVpn> for MsgVpn {
     }
 }
 
+
 //impl Save<MsgVpnQueue> for MsgVpnQueue {
 //    fn save(dir: &str, data: &MsgVpnQueue) -> Result<(), &'static str> where MsgVpnQueue: Serialize {
 //        let vpn_name = data.msg_vpn_name();
