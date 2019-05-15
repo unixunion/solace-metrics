@@ -1,9 +1,8 @@
 #[macro_use]
 extern crate log;
-extern crate env_logger;
+extern crate std_logger;
 extern crate influx_db_client;
 extern crate itertools;
-
 
 use std::error::Error;
 use clap::{Arg, App, load_yaml};
@@ -31,7 +30,8 @@ mod data;
 fn main() -> Result<(), Box<Error>> {
 
     // initialize the logger
-    env_logger::init();
+//    env_logger::init();
+    std_logger::init();
 
     // load args.yaml
     let yaml = load_yaml!("args.yaml");
@@ -154,25 +154,32 @@ fn main() -> Result<(), Box<Error>> {
     if matches.is_present("vpn") {
         if let Some(sub_matches) = matches.subcommand_matches("vpn") {
 
-            let x = MsgVpnResponse::get(
-                sub_matches.value_of("message-vpn").unwrap(),
-                "",
-                selector,
-                &client, &mut core);
+            let vpns = sub_matches.values_of("message-vpn").unwrap();
 
-            match x {
-                Ok(vpn) => {
-                    let p = MsgVpnResponse::create_metric("vpn-stats", &vpn, metatags, &mut influxdb_client);
-                    points.push(p);
+            for vpn in vpns {
+                info!("vpn {:?}", vpn);
+                let x = MsgVpnResponse::get(
+                    vpn,
+                    "",
+                    selector,
+                    &client, &mut core);
 
-                    if write_fetch_files {
-                        MsgVpnResponse::save(output_dir, &vpn);
+                match x {
+                    Ok(vpn) => {
+                        let p = MsgVpnResponse::create_metric("vpn-stats", &vpn, metatags.clone(), &mut influxdb_client);
+                        points.push(p);
+
+                        if write_fetch_files {
+                            MsgVpnResponse::save(output_dir, &vpn);
+                        }
+                    },
+                    Err(e) => {
+                        error!("unable to persist metric")
                     }
-                },
-                Err(e) => {
-                    error!("unable to persist metric")
                 }
             }
+
+
         }
     }
 

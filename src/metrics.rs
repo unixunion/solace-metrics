@@ -4,7 +4,7 @@ extern crate influx_db_client;
 use influx_db_client::{Point, Points, Precision};
 use influx_db_client::Client as InfluxClient;
 use influx_db_client::Value as InfluxValue;
-use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse};
+use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse, MsgVpnJndiQueueResponse};
 use std::collections::HashMap;
 use solace_semp_client_monitor::apis::client::APIClient;
 use hyper_tls::HttpsConnector;
@@ -33,10 +33,10 @@ pub trait Metric<T> {
 
         let mut point = Point::new(measurement_name);
 
-        info!("string: {:?}", data);
+        debug!("string: {:?}", data);
         let t: HashMap<String, Value> = serde_json::from_str(&data).unwrap();
         for (k,v) in t.into_iter() {
-            info!("key: {:?} value: {:?}", k, v);
+            debug!("key: {:?} value: {:?}", k, v);
 
             match v {
                 Value::Object(obj) => {
@@ -51,7 +51,7 @@ pub trait Metric<T> {
                     point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
                 },
                 _ => {
-                    warn!("skipping: {:?}, {:?}", k, v);
+                    debug!("skipping: {:?}, {:?}", k, v);
                 }
 
             }
@@ -129,4 +129,7 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
         }
     }
 }
+
+
+
 

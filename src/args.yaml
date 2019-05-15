@@ -51,4 +51,5 @@ subcommands:
             long: message-vpn
             help: vpn to fetch
             takes_value: true
+            multiple: true
             required: true

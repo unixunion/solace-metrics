@@ -12,17 +12,10 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 
 POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to influx.
 
-## Running
+## Running Dev
 
 ```
-RUST_LOG=info cargo run -- --output testdir --config solace.yaml --influxdb http://localhost:8086 --influxdb-user root --influxdb-pass root --influxdb-dbname smg vpn --message-vpn default 
-```
-
-## Testing
-
-```
-curl 'localhost:8086/query?pretty=true' --data-urlencode "db=smg" --data-urlencode "q=SELECT \"msg-spool-usage\" FROM \"message-vpn\""
-
-
-
+docker-compose up -d
+RUST_LOG=info RUST_BACKTRACE=1 cargo run -- --output testdir --config solace.yaml --influxdb http://localhost:8086 --influxdb-user root --influxdb-pass root --influxdb-dbname smg vpn --message-vpn default anothervpn anotherone andanotherone```
+curl 'localhost:8086/query?pretty=true' --data-urlencode "db=smg" --data-urlencode "q=SELECT \"rate_rxMsgRate\" FROM \"message-vpn\""
 ```
