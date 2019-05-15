@@ -37,23 +37,23 @@ pub trait Metric<T> {
         let t: HashMap<String, Value> = serde_json::from_str(&data).unwrap();
         for (k,v) in t.into_iter() {
             info!("key: {:?} value: {:?}", k, v);
-            match v.as_object() {
-                Some(o) => {
-                    let x = format!("{:?}", serde_json::to_string(&v).unwrap());
-                    info!("object: {:?} {:?}", k, x);
-                    self.make_fields(x, measurement_name);
-                }
-                None => {
-                    match v.as_i64() {
-                        Some(v1) => {
-                            info!("{:?} {:?}", k, v1);
-                            point.add_field(k, InfluxValue::Integer(v1));
-                        },
-                        None => {
-                            error!("skipping: {:?}, {:?}", k, v);
-                        }
+
+            match v {
+                Value::Object(obj) => {
+                    for (ok, ov) in obj {
+                        let key = format!("{}_{}", k, ok);
+                        info!("{:?} {:?}", key, ov);
+                        point.add_field(key, InfluxValue::Integer(ov.as_i64().unwrap()));
                     }
+                },
+                Value::Number(num) => {
+                    info!("{:?} {:?}", k, num);
+                    point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
+                },
+                _ => {
+                    warn!("skipping: {:?}, {:?}", k, v);
                 }
+
             }
 
         }
