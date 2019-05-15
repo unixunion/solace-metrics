@@ -30,46 +30,35 @@ pub trait Metric<T> {
     fn extract_data(item: &T) -> Point;
 
     fn make_fields(&self, data: String, measurement_name: &str) -> Result<Point, &'static str> {
-//        fn make_fields<'a>(&self, measurement_name: &str) -> Result<Point, &'static str> where Self: Data<'a, &T> {
+
         let mut point = Point::new(measurement_name);
 
         info!("string: {:?}", data);
         let t: HashMap<String, Value> = serde_json::from_str(&data).unwrap();
         for (k,v) in t.into_iter() {
-            match v.as_i64() {
-                Some(v1) => {
-                    info!("{:?} {:?}", k, v1);
-                    point.add_field(k, InfluxValue::Integer(v1));
-                },
+            info!("key: {:?} value: {:?}", k, v);
+            match v.as_object() {
+                Some(o) => {
+                    let x = format!("{:?}", serde_json::to_string(&v).unwrap());
+                    info!("object: {:?} {:?}", k, x);
+                    self.make_fields(x, measurement_name);
+                }
                 None => {
-                    error!("skipping: {:?}", k);
+                    match v.as_i64() {
+                        Some(v1) => {
+                            info!("{:?} {:?}", k, v1);
+                            point.add_field(k, InfluxValue::Integer(v1));
+                        },
+                        None => {
+                            error!("skipping: {:?}, {:?}", k, v);
+                        }
+                    }
                 }
             }
+
         }
         Ok(point)
 
-//        match serde_json::to_string(&self.data().unwrap()) {
-//            Ok(s) => {
-//                info!("string: {:?}", &s);
-//                let t: HashMap<String, Value> = serde_json::from_str(&s).unwrap();
-//                for (k,v) in t.into_iter() {
-//                    match v.as_i64() {
-//                        Some(v1) => {
-//                            info!("{:?} {:?}", k, v1);
-//                            point.add_field(k, InfluxValue::Integer(v1));
-//                        },
-//                        None => {
-//                            error!("skipping: {:?}", k);
-//                        }
-//                    }
-//                }
-//                Ok(point)
-//            },
-//            Err(e) => {
-//                error!("error serializing, {:?}", e);
-//                Err("error serializing")
-//            }
-//        }
     }
 }
 
@@ -105,7 +94,6 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
 
         let t = item.data().unwrap();
 
-//        let mut vpn_points =  item.make_fields("vpn-stats");
         let mut vpn_points = MsgVpnResponse::extract_data(item);
 
         for tag in tags {
@@ -120,18 +108,6 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
         info!("created point {:?}", vpn_points);
 
         vpn_points
-
-//        match vpn_points {
-//            Ok(points) => {
-//                points
-//            },
-//            _ => {
-//                unimplemented!()
-//            },
-//            Err(_) => {
-//                error!("something bad happened")
-//            }
-//        }
 
     }
 
@@ -154,29 +130,3 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
     }
 }
 
-
-
-
-//        match serde_json::to_string(&item.data().unwrap()) {
-//            Ok(s) => {
-//                info!("string: {:?}", &s);
-//
-//                let t: HashMap<String, Value> = serde_json::from_str(&s).unwrap();
-//                for (k,v) in t.into_iter() {
-//                    match v.as_i64() {
-//                        Some(v1) => {
-//                            info!("{:?} {:?}", k, v1);
-//                            vpn_points.add_field(k, InfluxValue::Integer(v1));
-//                        },
-//                        None => {
-//                            error!("skipping: {:?}", k);
-//                        }
-//                    }
-//                }
-//
-//
-//            },
-//            Err(e) => {
-//                error!("error serializing, {:?}", e);
-//            }
-//        }
