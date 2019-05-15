@@ -41,12 +41,12 @@ pub trait Save<T> {
 
         match item_name {
             Some(titem) => {
-                let target_file = &format!("{}/{}/{}/{}.yaml", output_dir, t_vpn_name, subdir, titem);
+                let target_file = &format!("{}/{}/{}/{}.json", output_dir, t_vpn_name, subdir, titem);
                 let mut f = File::create(target_file);
                 match f {
                     Ok(mut _f) => {
 
-                        let serialized_item = serde_yaml::to_string(self);
+                        let serialized_item = serde_json::to_string_pretty(self);
                         match serialized_item {
                             Ok(item) => {
                                 _f.write(item.as_bytes());
