@@ -16,12 +16,18 @@ POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to inf
 
 All other metrics, pending Solace issue with OpenAPI spec.
 
+## Building
+
+```
+cargo build --release
+```
+
 ## Running
 
 Runs once, writes metrics to influx, and exits.
 
 ```
-solace-monitor 0.1.6
+solace-monitor 0.0.1
 Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
 SEMPv2 version 9.1.0.77 solace monitoring tool, see https://github.com/unixunion/solace-monitor for src and examples
 
@@ -62,6 +68,18 @@ FLAGS:
 
 OPTIONS:
         --message-vpn <message-vpn>...    vpn(s) to fetch
+```
+
+### Example
+
+```
+RUST_LOG=info solace-monitor \
+    --config solace.yaml \
+    --influxdb http://localhost:8086 \
+    --influxdb-user root \
+    --influxdb-pass root \
+    --influxdb-dbname smg \
+    vpn --message-vpn default other_vpn another_vpn
 ```
 
 ## Running Dev
