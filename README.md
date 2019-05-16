@@ -21,6 +21,7 @@ All other metrics, pending Solace issue with OpenAPI spec.
 The configuration is simple, the meta key is the dimensions to add to any Influx points produced, and the credentials 
 to solace should be your readonly user.
 
+```yaml
 ---
 meta:
   environment: dev
@@ -34,6 +35,7 @@ certs:
     -----BEGIN CERTIFICATE-----
     ...
     -----END CERTIFICATE----
+```
 
 ## Building
 
