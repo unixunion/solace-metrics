@@ -16,6 +16,25 @@ POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to inf
 
 All other metrics, pending Solace issue with OpenAPI spec.
 
+## Configuration
+
+The configuration is simple, the meta key is the dimensions to add to any Influx points produced, and the credentials 
+to solace should be your readonly user.
+
+---
+meta:
+  environment: dev
+  app: solace
+  host: solace-mq.local
+username: readonly
+password: readonly
+host: http://localhost:8081/SEMP/v2/monitor
+certs:
+  - |
+    -----BEGIN CERTIFICATE-----
+    ...
+    -----END CERTIFICATE----
+
 ## Building
 
 ```
