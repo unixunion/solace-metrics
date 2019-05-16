@@ -14,6 +14,8 @@ POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to inf
 
 ## Running
 
+Runs once, writes metrics to influx, and exits.
+
 ```
 solace-monitor 0.1.6
 Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
@@ -38,6 +40,24 @@ OPTIONS:
 SUBCOMMANDS:
     help    Prints this message or the help of the given subcommand(s)
     vpn     vpn metrics
+```
+
+### VPN metrics
+
+```
+solace-monitor-vpn 9.1.0.77
+Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
+vpn metrics
+
+USAGE:
+    solace-monitor vpn --message-vpn <message-vpn>...
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+        --message-vpn <message-vpn>...    vpn(s) to fetch
 ```
 
 ## Running Dev
