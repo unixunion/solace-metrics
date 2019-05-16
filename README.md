@@ -12,6 +12,10 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 
 POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to influx.
 
+## Todo
+
+All other metrics, pending Solace issue with OpenAPI spec.
+
 ## Running
 
 Runs once, writes metrics to influx, and exits.
