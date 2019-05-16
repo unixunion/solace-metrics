@@ -70,10 +70,6 @@ fn main() -> Result<(), Box<Error>> {
     let mut cursor = Cow::Borrowed("");
     let mut select = "*";
 
-    // default emoji for OK / Error logging
-    let mut ok_emoji = Cow::Borrowed("👍");
-    let mut err_emoji = Cow::Borrowed("❌");
-
     // configure the http client
     let mut core = Core::new().unwrap();
     let handle = core.handle();
@@ -136,8 +132,6 @@ fn main() -> Result<(), Box<Error>> {
             configuration.base_path = sc.host;
             let auth = helpers::gencred(sc.username, sc.password);
             configuration.basic_auth = Some(auth);
-            ok_emoji = Cow::Owned(sc.ok_emoji);
-            err_emoji = Cow::Owned(sc.err_emoji);
         },
         Err(e) => error!("error reading config: {}", e)
     }
