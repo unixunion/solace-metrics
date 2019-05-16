@@ -12,6 +12,34 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 
 POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to influx.
 
+## Running
+
+```
+solace-monitor 0.1.6
+Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
+SEMPv2 version 9.1.0.77 solace monitoring tool, see https://github.com/unixunion/solace-monitor for src and examples
+
+USAGE:
+    solace-monitor [OPTIONS] --config <CONFIG> --influxdb <influxdb> --influxdb-dbname <influxdb-dbname> --influxdb-pass <influxdb-pass> --influxdb-user <influxdb-user> [SUBCOMMAND]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+        --config <CONFIG>                      Sets the solace config file
+        --influxdb <influxdb>                  influxdb url e.g http://127.0.0.1:8086
+        --influxdb-dbname <influxdb-dbname>    the db name
+        --influxdb-pass <influxdb-pass>        influxdb password
+        --influxdb-user <influxdb-user>        influxdb user
+        --output <output>                      output dir
+        --selector <selector>                  selector, default "*"
+
+SUBCOMMANDS:
+    help    Prints this message or the help of the given subcommand(s)
+    vpn     vpn metrics
+```
+
 ## Running Dev
 
 ```
