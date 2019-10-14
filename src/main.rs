@@ -17,15 +17,19 @@ use solace_semp_client_monitor::apis::client::APIClient;
 use influx_db_client::{Point, Points, Value, Precision};
 use influx_db_client::Client as InfluxClient;
 use crate::helpers::getselect;
-use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse};
-use crate::metrics::Metric;
+use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse, MsgVpnClientConnectionsResponse, MsgVpnClientResponse, MsgVpnClientsResponse};
 use crate::save::Save;
 use std::collections::HashMap;
+use crate::metric::Metric;
+use crate::vpn::MsgVpnReq;
+use crate::client_conn::MsgVpnClientReq;
 
 mod helpers;
 mod clientconfig;
-mod metrics;
+mod vpn;
 mod save;
+mod metric;
+mod client_conn;
 
 fn main() -> Result<(), Box<Error>> {
 
@@ -152,16 +156,21 @@ fn main() -> Result<(), Box<Error>> {
 
             for vpn in vpns {
                 info!("vpn {:?}", vpn);
-                let x = MsgVpnResponse::get(
-                    vpn,
-                    "",
-                    selector,
-                    &client, &mut core);
+
+                let vpn = MsgVpnReq{
+                    vpn_name: vpn.to_string(),
+                    selectv: selector.to_string()
+                };
+
+                let x= MsgVpnReq::get(&vpn, &client, &mut core);
 
                 match x {
                     Ok(vpn) => {
-                        let p = MsgVpnResponse::create_metric("vpn-stats", &vpn, metatags.clone(), &mut influxdb_client);
-                        points.push(p);
+                        let p = MsgVpnReq::create_metric("vpn-stats", &vpn, metatags.clone(), &mut influxdb_client);
+                        for v in p {
+                            points.push(v);
+                        }
+
 
                         if write_fetch_files {
                             MsgVpnResponse::save(output_dir, &vpn);
@@ -172,10 +181,54 @@ fn main() -> Result<(), Box<Error>> {
                     }
                 }
             }
+        }
+    }
 
+    // client connections
+    if matches.is_present("client-conn") {
+        if let Some(sub_matches) = matches.subcommand_matches("client-conn") {
+
+            let client_session_name = sub_matches.value_of("name").unwrap();
+            let vpn_name = sub_matches.value_of("message-vpn").unwrap_or("default");
+
+            info!("client session name {:?}", client_session_name);
+
+            let clients = MsgVpnClientReq {
+                vpn_name: vpn_name.to_string(),
+                client_name: client_session_name.to_owned(),
+                count: 10,
+                cursor: "".to_string(),
+                selector: "*".to_string()
+            };
+
+            let x= MsgVpnClientReq::get(&clients, &client, &mut core);
+
+            match x {
+                Ok(clients) => {
+                    info!("client: {:?}", clients);
+
+//                    for client in clients.data().unwrap() {
+//
+//
+//                    }
+                    let p = MsgVpnClientReq::create_metric("vpn-stats", &clients, metatags.clone(), &mut influxdb_client);
+
+                    for v in p {
+                        points.push(v);
+                    }
+
+                    if write_fetch_files {
+                        MsgVpnClientsResponse::save(output_dir, &clients);
+                    }
+                },
+                Err(e) => {
+                    error!("unable to persist metric")
+                }
+            }
 
         }
     }
+
 
     info!("writing points to influxdb");
     let num_points = &points.len();

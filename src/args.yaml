@@ -53,3 +53,20 @@ subcommands:
             takes_value: true
             multiple: true
             required: true
+  - client-conn:
+      about: client connections
+      version: 9.1.0.77
+      author: Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
+      # Subcommand args are exactly like App args
+      args:
+        - name:
+            long: name
+            help: client sessions to match
+            takes_value: true
+            multiple: false
+            required: true
+        - message-vpn:
+            long: message-vpn
+            help: vpn
+            takes_value: true
+            required: true

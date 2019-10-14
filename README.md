@@ -10,7 +10,7 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 
 ## Status
 
-POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to influx.
+POC to query some [message-vpn](src/vpn.rs) metrics, and persist them to influx.
 
 ## Todo
 

@@ -5,7 +5,7 @@ authors = ["Kegan Holtzhausen <Kegan.Holtzhausen@kindredgroup.com>"]
 edition = "2018"
 
 [dependencies]
-solace_semp_client_monitor = { git = "https://github.com/unixunion/rust_solace_semp_client_monitor.git", tag="9.1.0.77" }
+solace_semp_client_monitor = { git = "https://github.com/unixunion/rust_solace_semp_client_monitor.git", branch="master" }
 hyper = "0.11.6"
 hyper-tls = "0.1.4"
 native-tls = "0.1.5"
