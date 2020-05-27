@@ -4,7 +4,7 @@ extern crate influx_db_client;
 use influx_db_client::{Point, Points, Precision};
 use influx_db_client::Client as InfluxClient;
 use influx_db_client::Value as InfluxValue;
-use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse, MsgVpnJndiQueueResponse};
+use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnsResponse, MsgVpnQueueResponse, MsgVpnQueuesResponse};
 use std::collections::HashMap;
 use solace_semp_client_monitor::apis::client::APIClient;
 use hyper_tls::HttpsConnector;
@@ -24,24 +24,25 @@ mod test {
 }
 
 
-pub struct MsgVpnReq{
-    pub vpn_name: String,
+pub struct MsgVpnQueueReq{
+    pub msg_vpn_name: String,
+    pub queue_name: String,
     pub selectv: String
 }
 
 
-impl Metric<MsgVpnResponse> for MsgVpnReq {
-    //vpn_name: &str, subitem_name: &str, selector: &str
-    fn get(&self, apiclient: &APIClient<HttpsConnector<HttpConnector>>, core: &mut Core) -> Result<MsgVpnResponse, &'static str> {
+impl Metric<MsgVpnQueueResponse> for MsgVpnQueueReq {
+    //queue_name: &str, subitem_name: &str, selector: &str
+    fn get(&self, apiclient: &APIClient<HttpsConnector<HttpConnector>>, core: &mut Core) -> Result<MsgVpnQueueResponse, &'static str> {
 
         let selector = self.selectv.as_ref();
 
         let request = apiclient
             .default_api()
-            .get_msg_vpn(self.vpn_name.as_ref(), getselect(selector))
-            .and_then(|vpn| {
-                println!("response: {:?}", vpn);
-                futures::future::ok(vpn)
+            .get_msg_vpn_queue(self.msg_vpn_name.as_ref(), self.queue_name.as_ref(), getselect(selector))
+            .and_then(|queue| {
+                println!("response: {:?}", queue);
+                futures::future::ok(queue)
             });
 
         match core.run(request) {
@@ -51,7 +52,6 @@ impl Metric<MsgVpnResponse> for MsgVpnReq {
             },
             Err(e) => {
                 println!("get monitor error: {:?}", e);
-                //println!("{:?}", &response.data().unwrap().unwrap());
                 Err("fetch error")
             }
         }
@@ -59,11 +59,11 @@ impl Metric<MsgVpnResponse> for MsgVpnReq {
 
     }
 
-    fn create_metric(point: &str, item: &MsgVpnResponse, tags: HashMap<String, String>, influxdb_client: &mut InfluxClient) -> Vec<Point> {
+    fn create_metric(point: &str, item: &MsgVpnQueueResponse, tags: HashMap<String, String>, influxdb_client: &mut InfluxClient) -> Vec<Point> {
 
         let t = item.data().unwrap();
 
-        let mut vpn_points = MsgVpnReq::extract_data(item);
+        let mut vpn_points = MsgVpnQueueReq::extract_data(item);
 
         for tag in tags {
             for mut v in &mut vpn_points {
@@ -78,10 +78,10 @@ impl Metric<MsgVpnResponse> for MsgVpnReq {
 
     }
 
-    fn extract_data(item: &MsgVpnResponse) -> Vec<Point> {
+    fn extract_data(item: &MsgVpnQueueResponse) -> Vec<Point> {
         match serde_json::to_string(item.data().unwrap()) {
             Ok(s) => {
-                match item.make_fields(s, "message-vpn") {
+                match item.make_fields(s, "message-vpn-queue") {
                     Ok(p) => {
                         vec![p]
                     }

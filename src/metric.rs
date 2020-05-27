@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 use influx_db_client::Client as InfluxClient;
 use influx_db_client::Value as InfluxValue;
-use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnClientConnectionsResponse, MsgVpnClientResponse, MsgVpnClientsResponse};
+use solace_semp_client_monitor::models::{MsgVpnResponse, MsgVpnClientConnectionsResponse, MsgVpnClientResponse, MsgVpnClientsResponse, MsgVpnQueueResponse};
 use std::collections::hash_map::RandomState;
 use serde::Serialize;
 
@@ -134,6 +134,78 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
 
             }
             Ok(point)
+
+
+    }
+}
+
+
+// queue
+impl Metric<MsgVpnQueueResponse> for MsgVpnQueueResponse {
+
+    fn get(&self, apiclient: &APIClient<HttpsConnector<HttpConnector>>, core: &mut Core) -> Result<MsgVpnQueueResponse, &'static str> {
+        unimplemented!()
+    }
+
+    fn create_metric(point: &str, item: &MsgVpnQueueResponse, tags: HashMap<String, String, RandomState>, influxdb_client: &mut Client) -> Vec<Point> {
+        unimplemented!()
+    }
+
+
+    fn extract_data(item: &MsgVpnQueueResponse) -> Vec<Point> where MsgVpnQueueResponse: Serialize {
+        match serde_json::to_string(item.data().unwrap()) {
+            Ok(s) => {
+                match item.make_fields(s, "message-vpn-queue") {
+                    Ok(p) => {
+                        vec![p]
+                    }
+                    _ => {
+                        unimplemented!()
+                    }
+                }
+            }
+            _ => {
+                unimplemented!()
+            }
+        }
+    }
+
+    fn make_fields(&self, data: String, measurement_name: &str) -> Result<Point, &'static str> {
+
+        let mut point = Point::new(measurement_name);
+
+        info!("string: {:?}", data);
+
+//            let t: Vec<Value> = serde_json::from_str(&data).unwrap()?;
+
+//        debug!("type {}", serde_json::from_str(&data).unwrap());
+        let t: HashMap<String, Value> = serde_json::from_str(&data).unwrap();
+
+        for (k,v) in t.into_iter() {
+            debug!("key: {:?} value: {:?}", k, v);
+
+            match v {
+                // descend into objets
+                Value::Object(obj) => {
+                    for (ok, ov) in obj {
+                        let key = format!("{}_{}", k, ok);
+                        info!("{:?} {:?}", key, ov);
+                        point.add_field(key, InfluxValue::Integer(ov.as_i64().unwrap()));
+                    }
+                },
+                // add keys with number values
+                Value::Number(num) => {
+                    info!("{:?} {:?}", k, num);
+                    point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
+                },
+                // skip anything else
+                _ => {
+                    debug!("skipping: {:?}, {:?}", k, v);
+                }
+            }
+
+        }
+        Ok(point)
 
 
     }
