@@ -41,13 +41,13 @@ impl Metric<MsgVpnQueueResponse> for MsgVpnQueueReq {
             .default_api()
             .get_msg_vpn_queue(self.msg_vpn_name.as_ref(), self.queue_name.as_ref(), getselect(selector))
             .and_then(|queue| {
-                println!("response: {:?}", queue);
+                debug!("response: {:?}", queue);
                 futures::future::ok(queue)
             });
 
         match core.run(request) {
             Ok(response) => {
-                info!("{}",format!("{}", serde_yaml::to_string(&response.data().unwrap()).unwrap()));
+                debug!("{}",format!("{}", serde_yaml::to_string(&response.data().unwrap()).unwrap()));
                 Ok(response)
             },
             Err(e) => {
