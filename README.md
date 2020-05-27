@@ -10,7 +10,7 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 
 ## Status
 
-POC to query some [message-vpn](src/vpn.rs) and [queue](src/queue.rs) metrics, and persist them to influx.
+Rudimentary support for to query [message-vpn](src/vpn.rs) and [queue](src/queue.rs) metrics, and persist those to influx.
 
 ## Todo
 
@@ -50,7 +50,7 @@ Runs once, writes metrics to influx, and exits.
 ```
 solace-monitor 0.0.1
 Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
-SEMPv2 version 9.1.0.77 solace monitoring tool, see https://github.com/unixunion/solace-monitor for src and examples
+SEMPv2 version 9.5.0.30 solace monitoring tool, see https://github.com/unixunion/solace-monitor for src and examples
 
 USAGE:
     solace-monitor [OPTIONS] --config <CONFIG> --influxdb <influxdb> --influxdb-dbname <influxdb-dbname> --influxdb-pass <influxdb-pass> --influxdb-user <influxdb-user> [SUBCOMMAND]
@@ -70,26 +70,8 @@ OPTIONS:
 
 SUBCOMMANDS:
     help    Prints this message or the help of the given subcommand(s)
-    queue          queue metrics
+    queue   queue metrics
     vpn     vpn metrics
-```
-
-### VPN metrics
-
-```
-solace-monitor-vpn 9.1.0.77
-Kegan Holtzhausen <kegan.holtzhausen@kindredgroup.com>
-vpn metrics
-
-USAGE:
-    solace-monitor vpn --message-vpn <message-vpn>...
-
-FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-OPTIONS:
-        --message-vpn <message-vpn>...    vpn(s) to fetch
 ```
 
 ### Example
