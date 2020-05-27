@@ -102,7 +102,7 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
 
             let mut point = Point::new(measurement_name);
 
-            info!("string: {:?}", data);
+            debug!("string: {:?}", data);
 
 //            let t: Vec<Value> = serde_json::from_str(&data).unwrap()?;
 
@@ -117,13 +117,13 @@ impl Metric<MsgVpnResponse> for MsgVpnResponse {
                     Value::Object(obj) => {
                         for (ok, ov) in obj {
                             let key = format!("{}_{}", k, ok);
-                            info!("{:?} {:?}", key, ov);
+                            debug!("{:?} {:?}", key, ov);
                             point.add_field(key, InfluxValue::Integer(ov.as_i64().unwrap()));
                         }
                     },
                     // add keys with number values
                     Value::Number(num) => {
-                        info!("{:?} {:?}", k, num);
+                        debug!("{:?} {:?}", k, num);
                         point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
                     },
                     // skip anything else
@@ -174,7 +174,7 @@ impl Metric<MsgVpnQueueResponse> for MsgVpnQueueResponse {
 
         let mut point = Point::new(measurement_name);
 
-        info!("string: {:?}", data);
+        debug!("string: {:?}", data);
 
 //            let t: Vec<Value> = serde_json::from_str(&data).unwrap()?;
 
@@ -189,13 +189,13 @@ impl Metric<MsgVpnQueueResponse> for MsgVpnQueueResponse {
                 Value::Object(obj) => {
                     for (ok, ov) in obj {
                         let key = format!("{}_{}", k, ok);
-                        info!("{:?} {:?}", key, ov);
+                        debug!("{:?} {:?}", key, ov);
                         point.add_field(key, InfluxValue::Integer(ov.as_i64().unwrap()));
                     }
                 },
                 // add keys with number values
                 Value::Number(num) => {
-                    info!("{:?} {:?}", k, num);
+                    debug!("{:?} {:?}", k, num);
                     point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
                 },
                 // skip anything else
@@ -250,13 +250,13 @@ impl Metric<MsgVpnClientsResponse> for MsgVpnClientsResponse {
     fn make_fields(&self, data: String, measurement_name: &str) -> Result<Point, &'static str> {
         let mut point = Point::new(measurement_name);
 
-        info!("string: {:?}", data);
+        debug!("string: {:?}", data);
 
         let t: Vec<Value> = serde_json::from_str(&data).unwrap();
 
         for i in t.into_iter() {
 
-            info!(" value: {:?}", i);
+            debug!(" value: {:?}", i);
 
             for (k,v) in i.as_object().unwrap() {
 
@@ -267,13 +267,13 @@ impl Metric<MsgVpnClientsResponse> for MsgVpnClientsResponse {
                     Value::Object(obj) => {
                         for (ok, ov) in obj {
                             let key = format!("{}_{}", k, ok);
-                            info!("{:?} {:?}", key, ov);
+                            debug!("{:?} {:?}", key, ov);
                             point.add_field(key, InfluxValue::Integer(ov.as_i64().unwrap()));
                         }
                     },
                     // add keys with number values
                     Value::Number(num) => {
-                        info!("{:?} {:?}", k, num);
+                        debug!("{:?} {:?}", k, num);
                         point.add_field(k, InfluxValue::Integer(num.as_i64().unwrap()));
                     },
                     // skip anything else

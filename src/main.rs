@@ -1,6 +1,6 @@
 #[macro_use]
 extern crate log;
-extern crate std_logger;
+//extern crate env_logger;
 extern crate influx_db_client;
 extern crate itertools;
 
@@ -36,8 +36,8 @@ mod client_conn;
 fn main() -> Result<(), Box<Error>> {
 
     // initialize the logger
-//    env_logger::init();
-    std_logger::init();
+    env_logger::init();
+    //std_logger::init();
 
     // load args.yaml
     let yaml = load_yaml!("args.yaml");
@@ -168,7 +168,7 @@ fn main() -> Result<(), Box<Error>> {
 
                 match x {
                     Ok(vpn) => {
-                        info!("{:?}", &vpn.data().unwrap());
+                        debug!("{:?}", &vpn.data().unwrap());
                         let p = MsgVpnReq::create_metric("vpn-stats", &vpn, metatags.clone(), &mut influxdb_client);
                         for v in p {
                             points.push(v);
@@ -211,7 +211,7 @@ fn main() -> Result<(), Box<Error>> {
 
                 match x {
                     Ok(queue) => {
-                        info!("{:?}", &queue.data().unwrap());
+                        debug!("{:?}", &queue.data().unwrap());
                         let p = MsgVpnQueueReq::create_metric("queue-stats", &queue, queuetags.clone(), &mut influxdb_client);
                         for v in p {
                             points.push(v);
