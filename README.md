@@ -10,7 +10,7 @@ This is a exploratory program to determine the capabilities of Solace's SEMPv2 m
 
 ## Status
 
-POC to query some [message-vpn](src/metrics.rs) metrics, and persist them to influx.
+POC to query some [message-vpn](src/vpn.rs) and [queue](src/queue.rs) metrics, and persist them to influx.
 
 ## Todo
 
@@ -93,6 +93,8 @@ OPTIONS:
 
 ### Example
 
+#### VPN
+
 ```
 RUST_LOG=info solace-monitor \
     --config solace.yaml \
@@ -101,6 +103,18 @@ RUST_LOG=info solace-monitor \
     --influxdb-pass root \
     --influxdb-dbname smg \
     vpn --message-vpn default other_vpn another_vpn
+```
+
+#### Queue
+
+```
+RUST_LOG=info solace-monitor \
+    --config solace.yaml \
+    --influxdb http://localhost:8086 \
+    --influxdb-user root \
+    --influxdb-pass root \
+    --influxdb-dbname smg \
+ queue --message-vpn default --queue myqueue.name
 ```
 
 ## Running Dev

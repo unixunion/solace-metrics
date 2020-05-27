@@ -3,7 +3,7 @@ use std::path::Path;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use solace_semp_client_monitor::models::{MsgVpn, MsgVpnsResponse, MsgVpnResponse};
+use solace_semp_client_monitor::models::{MsgVpn, MsgVpnsResponse, MsgVpnResponse, MsgVpnClientConnectionsResponse, MsgVpnClient, MsgVpnClientConnection, MsgVpnClientResponse, MsgVpnClientsResponse, MsgVpnQueue, MsgVpnQueuesResponse, MsgVpnQueueResponse};
 
 extern crate sha1;
 
@@ -79,16 +79,25 @@ impl Save<MsgVpn> for MsgVpn {
     }
 }
 
+impl Save<MsgVpnClient> for MsgVpnClient {
+    fn save(dir: &str, data: &MsgVpnClient) -> Result<(), &'static str> where MsgVpnClient: Serialize {
+        let vpn_name = data.msg_vpn_name();
+        let item_name = data.msg_vpn_name();
+        info!("save client: {:?}, {:?}", vpn_name, item_name);
+        data.save_in_dir(dir, "client", &vpn_name, &item_name);
+        Ok(())
+    }
+}
 
-//impl Save<MsgVpnQueue> for MsgVpnQueue {
-//    fn save(dir: &str, data: &MsgVpnQueue) -> Result<(), &'static str> where MsgVpnQueue: Serialize {
-//        let vpn_name = data.msg_vpn_name();
-//        let item_name = data.queue_name();
-//        debug!("save queue: {:?}, {:?}", vpn_name, item_name);
-//        data.save_in_dir(dir, "queue", &vpn_name, &item_name);
-//        Ok(())
-//    }
-//}
+impl Save<MsgVpnQueue> for MsgVpnQueue {
+   fn save(dir: &str, data: &MsgVpnQueue) -> Result<(), &'static str> where MsgVpnQueue: Serialize {
+       let vpn_name = data.msg_vpn_name();
+       let item_name = data.queue_name();
+       debug!("save queue: {:?}, {:?}", vpn_name, item_name);
+       data.save_in_dir(dir, "queue", &vpn_name, &item_name);
+       Ok(())
+   }
+}
 
 //impl Save<MsgVpnAclProfile> for MsgVpnAclProfile {
 //    fn save(dir: &str, data: &MsgVpnAclProfile) -> Result<(), &'static str> where MsgVpnAclProfile: Serialize {
@@ -139,26 +148,48 @@ impl Save<MsgVpnResponse> for MsgVpnResponse {
     }
 }
 
-//impl Save<MsgVpnQueuesResponse> for MsgVpnQueuesResponse {
-//    fn save(dir: &str, data: &MsgVpnQueuesResponse) -> Result<(), &'static str> where MsgVpnQueuesResponse: Serialize {
-//        match data.data() {
-//            Some(items) => {
-//                for item in items {
-//                    match MsgVpnQueue::save(dir, item) {
-//                        Ok(t) => debug!("success saving"),
-//                        Err(e) => error!("error writing: {:?}", e)
-//                    }
-//
-//                }
-//                Ok(())
-//            },
-//            _ => {
-//                error!("no queues");
-//                Err("no queues")
-//            }
-//        }
-//    }
-//}
+impl Save<MsgVpnClientsResponse> for MsgVpnClientsResponse {
+    fn save(dir: &str, data: &MsgVpnClientsResponse) -> Result<(), &'static str> where MsgVpnClientsResponse: Serialize {
+        match data.data() {
+            Some(clients) => {
+
+                while let Some(client) = clients.clone().pop() {
+                    match MsgVpnClient::save(dir, &client) {
+                        Ok(t) => debug!("success saving"),
+                        Err(e) => error!("error writing: {:?}", e)
+                    }
+                }
+
+                Ok(())
+            },
+            _ => {
+                error!("no vpns");
+                Err("no vpns")
+            }
+        }
+    }
+}
+
+impl Save<MsgVpnQueueResponse> for MsgVpnQueueResponse {
+   fn save(dir: &str, data: &MsgVpnQueueResponse) -> Result<(), &'static str> where MsgVpnQueueResponse: Serialize {
+       match data.data() {
+           Some(item) => {
+               // for item in items {
+                   match MsgVpnQueue::save(dir, item) {
+                       Ok(t) => debug!("success saving"),
+                       Err(e) => error!("error writing: {:?}", e)
+                   }
+
+               // }
+               Ok(())
+           },
+           _ => {
+               error!("no queues");
+               Err("no queues")
+           }
+       }
+   }
+}
 //
 //impl Save<MsgVpnAclProfilesResponse> for MsgVpnAclProfilesResponse {
 //    fn save(dir: &str, data: &MsgVpnAclProfilesResponse) -> Result<(), &'static str> where MsgVpnAclProfilesResponse: Serialize {

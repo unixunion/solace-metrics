@@ -1,30 +1,35 @@
 version: '3'
 services:
-  solace-http:
-    container_name: solace_http
-    image: solace-pubsub-standard:9.1.0.77
-    shm_size: 2g
-    ulimits:
-      core: 1
-      nofile:
-        soft: 418332
-        hard: 418332
-    ports:
-      #SEMP / PubSub+ Manager
-      - '8081:8080'
-      #SMF
-      - '55556:55555'
-    environment:
-      - username_admin_globalaccesslevel=admin
-      - username_admin_password=admin
-      - system_scaling_maxconnectioncount=100
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 0m15s
-      timeout: 10s
-      retries: 999
+#  solace-http:
+#    container_name: solace_http
+#    image: solace-pubsub-standard:latest
+#    shm_size: 2g
+#    ulimits:
+#      core: 1
+#      nofile:
+#        soft: 418332
+#        hard: 418332
+#    ports:
+#      #SEMP / PubSub+ Manager
+#      - '8081:8080'
+#      #SMF
+#      - '55556:55555'
+#    environment:
+#      - username_admin_globalaccesslevel=admin
+#      - username_admin_password=admin
+#      - system_scaling_maxconnectioncount=100
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+#      interval: 0m15s
+#      timeout: 10s
+#      retries: 999
   influxdb:
     container_name: influxdb
-    image: influxdb:1.5
+    image: influxdb:latest
     ports:
       - '8086:8086'
+  chronograf:
+    container_name: chrono
+    image: chronograf:latest
+    ports:
+      - '8888:8888'
