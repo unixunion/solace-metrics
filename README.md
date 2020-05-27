@@ -70,6 +70,7 @@ OPTIONS:
 
 SUBCOMMANDS:
     help    Prints this message or the help of the given subcommand(s)
+    queue          queue metrics
     vpn     vpn metrics
 ```
 
