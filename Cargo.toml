@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 solace_semp_client_monitor = { git = "https://github.com/unixunion/rust_solace_semp_client_monitor.git", branch="9.5-branch" }
-hyper = "0.11.6"
+hyper = "0.14.5"
 hyper-tls = "0.1.4"
 native-tls = "0.1.5"
 colored = "1.7"
